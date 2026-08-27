@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { notificationsApi } from '../../services/api';
@@ -14,20 +15,29 @@ import {
   Menu,
 } from 'lucide-react';
 import { SmsUssdSimulatorModal } from '../simulator/SmsUssdSimulatorModal';
+import { LanguageSelector } from './LanguageSelector';
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { isConnected, latestNotification } = useSocket();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/', { replace: true });
+  };
 
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [showSimulator, setShowSimulator] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<string>('');
+  const notifDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateTime = () => {
@@ -70,6 +80,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
     }
   }, [latestNotification]);
 
+  // Close notifications on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleMarkAllRead = async () => {
     try {
       await notificationsApi.markAllRead();
@@ -87,7 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
             <span className="font-bold tracking-wide">भारत सरकार | Government of India</span>
             <span className="text-emerald-400">•</span>
             <span className="text-emerald-100 hidden sm:inline">
-              Ministry of Agriculture & Farmers Welfare
+              {t('app.govtOfIndia')}
             </span>
           </div>
 
@@ -111,13 +132,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
 
         {/* Main Navbar */}
         <div className="px-4 sm:px-8 py-3 flex items-center justify-between">
-          {/* Logo & Mobile Menu */}
+          {/* Logo & Mobile Menu Button */}
           <div className="flex items-center space-x-3">
             {onToggleSidebar && (
               <button
                 onClick={onToggleSidebar}
-                className="lg:hidden p-1.5 rounded-xl text-[#1F2937] hover:bg-slate-100 transition cursor-pointer"
-                aria-label="Toggle navigation menu"
+                className="lg:hidden p-2 rounded-xl text-[#1F2937] hover:bg-slate-100 active:scale-95 transition cursor-pointer"
+                aria-label={t('nav.openMenu')}
               >
                 <Menu size={22} />
               </button>
@@ -137,32 +158,35 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                   </span>
                 </div>
                 <p className="text-[11px] text-[#4B5563] font-semibold mt-0.5">
-                  Smart Mandi Queue & Digital Procurement
+                  {t('app.tagline')}
                 </p>
               </div>
             </Link>
           </div>
 
-          {/* Right Action Icons */}
-          <div className="flex items-center space-x-2.5 sm:space-x-3">
-            {/* Feature Phone 2G Simulator (SMS / USSD) */}
+          {/* Right Action Items */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Language Selector */}
+            <LanguageSelector variant="header" />
+
+            {/* Offline 2G Feature Phone Simulator (SMS / USSD) */}
             <button
               onClick={() => setShowSimulator(true)}
-              className="px-3 py-2 bg-[#FEF9C3] hover:bg-[#FEF08A] text-[#854D0E] border border-[#FDE047] rounded-xl text-xs font-bold flex items-center space-x-1.5 transition shadow-2xs cursor-pointer"
+              className="px-3 py-1.5 bg-[#FEF9C3] hover:bg-[#FEF08A] text-[#854D0E] border border-[#FDE047] rounded-xl text-xs font-bold flex items-center space-x-1.5 transition shadow-2xs active:scale-95 cursor-pointer"
               title="Test SMS & USSD Booking without 4G Internet"
             >
-              <Smartphone size={15} />
-              <span className="hidden sm:inline">Offline (SMS/USSD) Channel</span>
+              <Smartphone size={14} />
+              <span className="hidden sm:inline">{t('nav.offlineSimulator')}</span>
             </button>
 
             {/* Notification Bell */}
-            <div className="relative">
+            <div className="relative" ref={notifDropdownRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 rounded-xl text-[#4B5563] hover:text-[#1F2937] hover:bg-slate-100 transition cursor-pointer"
-                aria-label="Open notifications"
+                className="relative p-2 rounded-xl text-[#4B5563] hover:text-[#1F2937] hover:bg-slate-100 active:scale-95 transition cursor-pointer"
+                aria-label={t('nav.notifications')}
               >
-                <Bell size={20} />
+                <Bell size={19} />
                 {unreadCount > 0 && (
                   <span className="absolute top-1 right-1 bg-rose-600 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-2xs">
                     {unreadCount}
@@ -176,10 +200,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                   <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Radio size={15} className="text-[#15803D] animate-pulse" />
-                      <span className="font-extrabold text-xs text-[#1F2937]">System Notifications</span>
+                      <span className="font-extrabold text-xs text-[#1F2937]">{t('notifications.title')}</span>
                       {unreadCount > 0 && (
                         <span className="bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] text-[10px] px-2 py-0.2 rounded-full font-bold">
-                          {unreadCount} unread
+                          {unreadCount} {t('common.all')}
                         </span>
                       )}
                     </div>
@@ -189,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                         className="text-[11px] text-[#15803D] hover:underline font-bold flex items-center space-x-0.5 cursor-pointer"
                       >
                         <CheckCheck size={14} />
-                        <span>Mark all read</span>
+                        <span>{t('notifications.markAllRead')}</span>
                       </button>
                     )}
                   </div>
@@ -197,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                   <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
                     {notifications.length === 0 ? (
                       <div className="p-8 text-center text-xs font-semibold text-[#4B5563]">
-                        No notifications found.
+                        {t('notifications.noNotifications')}
                       </div>
                     ) : (
                       notifications.map((n) => (
@@ -229,18 +253,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
 
             {/* User Profile info */}
             {user ? (
-              <div className="flex items-center space-x-3 pl-3 border-l border-slate-200">
-                <div className="hidden sm:block text-right">
-                  <p className="text-xs font-extrabold text-[#1F2937] leading-tight">{user.name}</p>
+              <div className="flex items-center space-x-2.5 pl-2.5 border-l border-slate-200">
+                <div className="hidden md:block text-right">
+                  <p className="text-xs font-extrabold text-[#1F2937] leading-tight truncate max-w-[140px]">
+                    {user.name}
+                  </p>
                   <p className="text-[10px] text-[#15803D] font-extrabold uppercase tracking-wide">
-                    {user.role.replace(/_/g, ' ')}
+                    {t(`roles.${user.role}`)}
                   </p>
                 </div>
 
                 <button
-                  onClick={logout}
-                  className="p-2 text-[#4B5563] hover:text-rose-700 hover:bg-rose-50 rounded-xl transition cursor-pointer"
-                  title="Logout"
+                  onClick={handleLogout}
+                  className="p-2 text-[#4B5563] hover:text-rose-700 hover:bg-rose-50 active:scale-95 rounded-xl transition cursor-pointer"
+                  title={t('nav.logout')}
                 >
                   <LogOut size={19} />
                 </button>
@@ -249,13 +275,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
               <div className="flex items-center space-x-2">
                 <Link
                   to="/login"
-                  className="px-4 py-2 bg-[#15803D] hover:bg-[#166534] text-white rounded-xl text-xs font-bold transition shadow-xs"
+                  className="px-3.5 py-1.5 bg-[#15803D] hover:bg-[#166534] text-white rounded-xl text-xs font-bold transition shadow-xs active:scale-95"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="hidden sm:inline-block px-4 py-2 bg-white hover:bg-slate-50 text-[#166534] rounded-xl text-xs font-bold transition border border-[#15803D]/40"
+                  className="hidden sm:inline-block px-3.5 py-1.5 bg-white hover:bg-slate-50 text-[#166534] rounded-xl text-xs font-bold transition border border-[#15803D]/40 active:scale-95"
                 >
                   Farmer Register
                 </Link>

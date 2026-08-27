@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { centresApi, slotsApi, bookingsApi } from '../../services/api';
 import { IProcurementCentre, ISlot, IBooking } from '../../types';
 import confetti from 'canvas-confetti';
@@ -28,6 +29,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { EmptyState } from '../../components/common/EmptyState';
 
 export const BookSlotPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<number>(1);
@@ -165,9 +167,9 @@ export const BookSlotPage: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Page Header */}
       <PageHeader
-        title="Book Procurement Slot"
+        title={t('farmer.wizardTitle')}
         description="Book your slot window in advance, receive a digital token, and skip long physical queues at the Mandi."
-        icon={<CalendarPlusIcon size={24} />}
+        icon={<Calendar size={24} />}
       />
 
       {/* Stepper Wizard Bar */}
@@ -179,7 +181,7 @@ export const BookSlotPage: React.FC = () => {
               : 'bg-white text-[#4B5563] border-slate-200'
           }`}
         >
-          1. Crop & Volume
+          {t('farmer.wizardStep1')}
         </div>
         <div
           className={`py-3 rounded-2xl border transition-all duration-150 ${
@@ -188,7 +190,7 @@ export const BookSlotPage: React.FC = () => {
               : 'bg-white text-[#4B5563] border-slate-200'
           }`}
         >
-          2. Mandi Yard
+          {t('farmer.wizardStep2')}
         </div>
         <div
           className={`py-3 rounded-2xl border transition-all duration-150 ${
@@ -197,7 +199,7 @@ export const BookSlotPage: React.FC = () => {
               : 'bg-white text-[#4B5563] border-slate-200'
           }`}
         >
-          3. Date & Slot
+          {t('farmer.wizardStep3')}
         </div>
       </div>
 
@@ -214,7 +216,7 @@ export const BookSlotPage: React.FC = () => {
         <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/90 shadow-2xs space-y-6 animate-fadeIn">
           <div>
             <label className="block text-xs font-extrabold text-[#4B5563] uppercase tracking-wider mb-3">
-              1. Choose Crop Variety
+              {t('farmer.wizardStep1')}
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
               {crops.map((crop) => {
@@ -248,7 +250,7 @@ export const BookSlotPage: React.FC = () => {
                     <div>
                       <h3 className="font-extrabold text-[#1F2937] text-sm">{crop.name}</h3>
                       <p className="text-xs text-[#4B5563] mt-1 font-semibold">
-                        Govt MSP: <strong className="text-[#166534]">₹{crop.msp}</strong> / {crop.unit}
+                        MSP: <strong className="text-[#166534]">₹{crop.msp}</strong> / {t('common.quintals')}
                       </p>
                     </div>
                   </button>
@@ -259,7 +261,7 @@ export const BookSlotPage: React.FC = () => {
 
           <div className="pt-5 border-t border-slate-100 space-y-2">
             <label className="block text-xs font-extrabold text-[#4B5563] uppercase tracking-wider">
-              2. Estimated Produce Quantity (in Quintals)
+              {t('farmer.cropQuantity')}
             </label>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <input
@@ -272,11 +274,11 @@ export const BookSlotPage: React.FC = () => {
                 required
               />
               <span className="text-xs sm:text-sm font-bold text-[#4B5563]">
-                Quintals (Metric Tons: {(quantity / 10).toFixed(1)} MT)
+                {t('common.quintals')} (Metric Tons: {(quantity / 10).toFixed(1)} MT)
               </span>
             </div>
             <p className="text-xs text-[#4B5563]">
-              * Standard government MSP calculation is estimated at ₹
+              * Standard government MSP estimate: ₹
               {(
                 quantity * (crops.find((c) => c.name === selectedCrop)?.msp || 2275)
               ).toLocaleString('en-IN')}
@@ -290,7 +292,7 @@ export const BookSlotPage: React.FC = () => {
               onClick={handleNextStep}
               icon={<ArrowRight size={16} />}
             >
-              Continue to Mandi Selection
+              {t('common.confirm')}
             </Button>
           </div>
         </div>
@@ -301,7 +303,7 @@ export const BookSlotPage: React.FC = () => {
         <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/90 shadow-2xs space-y-6 animate-fadeIn">
           <div>
             <label className="block text-xs font-extrabold text-[#4B5563] uppercase tracking-wider mb-3">
-              Select Nearest Mandi Yard
+              {t('farmer.wizardStep2')}
             </label>
             <div className="grid md:grid-cols-2 gap-4">
               {centres.map((c) => {
@@ -334,8 +336,8 @@ export const BookSlotPage: React.FC = () => {
                     <p className="text-xs text-[#4B5563] mt-1">{c.address}</p>
 
                     <div className="mt-3 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-[#4B5563]">
-                      <span>Hours: {c.operatingHours.open} - {c.operatingHours.close}</span>
-                      <span>Daily Cap: {c.capacityPerDay} Qtl</span>
+                      <span>{t('common.time')}: {c.operatingHours.open} - {c.operatingHours.close}</span>
+                      <span>Cap: {c.capacityPerDay} {t('common.quintals')}</span>
                     </div>
                   </button>
                 );
@@ -350,7 +352,7 @@ export const BookSlotPage: React.FC = () => {
               onClick={() => setStep(1)}
               icon={<ArrowLeft size={16} />}
             >
-              Back
+              {t('common.back')}
             </Button>
             <Button
               variant="primary"
@@ -358,13 +360,13 @@ export const BookSlotPage: React.FC = () => {
               onClick={handleNextStep}
               icon={<ArrowRight size={16} />}
             >
-              Continue to Date & Slot Window
+              {t('common.confirm')}
             </Button>
           </div>
         </div>
       )}
 
-      {/* STEP 3: DATE & TIME SLOT SELECTION */}
+      {/* STEP 3: DATE & TIME SLOT */}
       {step === 3 && (
         <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/90 shadow-2xs space-y-6 animate-fadeIn">
           <div>
@@ -376,101 +378,58 @@ export const BookSlotPage: React.FC = () => {
               value={selectedDate}
               min={new Date().toISOString().split('T')[0]}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="border border-slate-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none bg-white cursor-pointer"
+              className="border border-slate-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
             />
           </div>
 
           <div>
             <label className="block text-xs font-extrabold text-[#4B5563] uppercase tracking-wider mb-3">
-              Available Time Slots for {selectedDate}
+              {t('farmer.wizardStep3')} ({slots.length} available)
             </label>
 
             {slots.length === 0 ? (
               <EmptyState
-                icon={<Clock size={24} />}
-                title="No procurement slots available for this date"
-                description="Please pick a different date or choose another Mandi centre."
+                icon={<Clock size={28} />}
+                title="No available slots for this date"
+                description="Please pick another date or contact Mandi yard administration."
               />
             ) : (
-              <div className="grid sm:grid-cols-2 gap-3.5">
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {slots.map((s) => {
                   const isSelected = selectedSlot?._id === s._id;
-                  const isFull = s.status === 'FULL' || s.remainingCapacity <= 0;
-
+                  const isFull = s.remainingCapacity <= 0;
                   return (
                     <button
                       key={s._id}
                       type="button"
                       disabled={isFull}
                       onClick={() => setSelectedSlot(s)}
-                      className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer active:scale-[0.98] ${
+                      className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer ${
                         isFull
-                          ? 'border-slate-200 bg-slate-100/60 opacity-60 cursor-not-allowed'
+                          ? 'opacity-50 bg-slate-100 border-slate-200 cursor-not-allowed'
                           : isSelected
                           ? 'border-[#15803D] bg-[#DCFCE7]/40 ring-2 ring-[#15803D] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/50'
+                          : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-2.5">
-                        <div className="flex items-center space-x-2 font-black text-[#1F2937] text-sm sm:text-base">
-                          <Clock size={16} className="text-[#15803D]" />
-                          <span>
-                            {s.startTime} - {s.endTime}
-                          </span>
-                        </div>
-                        <Badge status={s.status} size="sm" />
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-mono font-black text-sm text-[#1F2937]">
+                          {s.startTime} - {s.endTime}
+                        </span>
+                        {isSelected && <CheckCircle2 size={16} className="text-[#15803D]" />}
                       </div>
-
-                      <div className="mt-2 text-xs space-y-1.5">
-                        <div className="flex justify-between text-xs font-semibold text-[#4B5563]">
-                          <span>Remaining Spots:</span>
-                          <strong className={isFull ? 'text-rose-600 font-bold' : 'text-[#166534] font-extrabold'}>
-                            {s.remainingCapacity} / {s.capacity} spots left
-                          </strong>
-                        </div>
-                        {/* Capacity Progress */}
-                        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                          <div
-                            className={`h-full ${isFull ? 'bg-rose-500' : 'bg-[#15803D]'}`}
-                            style={{
-                              width: `${Math.min(
-                                100,
-                                ((s.capacity - s.remainingCapacity) / s.capacity) * 100
-                              )}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
+                      <p className="text-xs text-[#4B5563] font-semibold">
+                        {isFull ? (
+                          <span className="text-rose-600 font-bold">Slot Full</span>
+                        ) : (
+                          <span>{s.remainingCapacity} spots remaining</span>
+                        )}
+                      </p>
                     </button>
                   );
                 })}
               </div>
             )}
-          </div>
-
-          {/* Booking Summary Box */}
-          <div className="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/90 space-y-2 text-xs sm:text-sm">
-            <h4 className="font-extrabold text-[#1F2937]">Summary Before Confirmation:</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[#1F2937]">
-              <div>
-                <span className="text-[#4B5563] block text-xs">Crop:</span>
-                <span className="font-bold">{selectedCrop}</span>
-              </div>
-              <div>
-                <span className="text-[#4B5563] block text-xs">Quantity:</span>
-                <span className="font-bold">{quantity} Quintals</span>
-              </div>
-              <div>
-                <span className="text-[#4B5563] block text-xs">Centre:</span>
-                <span className="font-bold truncate block">{selectedCentre?.name}</span>
-              </div>
-              <div>
-                <span className="text-[#4B5563] block text-xs">Time Slot:</span>
-                <span className="font-bold">
-                  {selectedSlot ? `${selectedSlot.startTime} - ${selectedSlot.endTime}` : 'None'}
-                </span>
-              </div>
-            </div>
           </div>
 
           <div className="flex justify-between pt-4 border-t border-slate-100">
@@ -480,23 +439,23 @@ export const BookSlotPage: React.FC = () => {
               onClick={() => setStep(2)}
               icon={<ArrowLeft size={16} />}
             >
-              Back
+              {t('common.back')}
             </Button>
             <Button
               variant="primary"
               size="md"
-              onClick={handleConfirmBooking}
               disabled={isLoading || !selectedSlot}
               isLoading={isLoading}
-              icon={<Sparkles size={16} />}
+              onClick={handleConfirmBooking}
+              icon={<CheckCircle2 size={16} />}
             >
-              Confirm & Issue Digital Token
+              {t('farmer.confirmBooking')}
             </Button>
           </div>
         </div>
       )}
 
-      {/* CONFIRMATION SUCCESS MODAL */}
+      {/* Booking Success Modal */}
       {bookingSuccess && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
           <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 text-center space-y-5 border border-emerald-200">
@@ -506,13 +465,13 @@ export const BookSlotPage: React.FC = () => {
 
             <div>
               <span className="text-xs uppercase font-extrabold text-[#166534] bg-[#DCFCE7] border border-[#86EFAC] px-3 py-1 rounded-full">
-                Booking Confirmed
+                {t('farmer.bookingSuccessTitle')}
               </span>
               <h2 className="text-3xl font-black text-[#1F2937] mt-2 font-mono tracking-tight">
                 {bookingSuccess.tokenNumber}
               </h2>
               <p className="text-xs text-[#4B5563] mt-1 font-semibold">
-                Your digital token is registered in the live Mandi queue.
+                {t('farmer.bookingSuccessMsg')}
               </p>
             </div>
 
@@ -526,14 +485,14 @@ export const BookSlotPage: React.FC = () => {
 
             <div className="bg-slate-50 p-3.5 rounded-xl text-xs text-[#1F2937] text-left space-y-1 border border-slate-200">
               <p>
-                <strong className="text-[#4B5563]">Mandi:</strong> {selectedCentre?.name}
+                <strong className="text-[#4B5563]">{t('common.mandi')}:</strong> {selectedCentre?.name}
               </p>
               <p>
-                <strong className="text-[#4B5563]">Date & Time:</strong> {bookingSuccess.scheduledDate} (
+                <strong className="text-[#4B5563]">{t('common.date')}:</strong> {bookingSuccess.scheduledDate} (
                 {selectedSlot?.startTime} - {selectedSlot?.endTime})
               </p>
               <p>
-                <strong className="text-[#4B5563]">Produce:</strong> {bookingSuccess.requestedQuantity} {bookingSuccess.unit}{' '}
+                <strong className="text-[#4B5563]">{t('common.crop')}:</strong> {bookingSuccess.requestedQuantity} {bookingSuccess.unit}{' '}
                 {bookingSuccess.cropType}
               </p>
             </div>
@@ -546,14 +505,14 @@ export const BookSlotPage: React.FC = () => {
                 className="flex-1"
                 icon={<Radio size={14} className="animate-pulse" />}
               >
-                Track Live Queue
+                {t('nav.myQueue')}
               </Button>
               <Button
                 variant="outline"
                 size="md"
                 onClick={() => navigate('/farmer')}
               >
-                Dashboard
+                {t('nav.dashboard')}
               </Button>
             </div>
           </div>
@@ -562,7 +521,3 @@ export const BookSlotPage: React.FC = () => {
     </div>
   );
 };
-
-const CalendarPlusIcon: React.FC<{ size?: number }> = ({ size = 24 }) => (
-  <Calendar size={size} />
-);

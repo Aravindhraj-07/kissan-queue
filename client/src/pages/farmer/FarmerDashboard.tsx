@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { farmerApi } from '../../services/api';
@@ -12,7 +13,9 @@ import {
   FileText,
   ArrowRight,
   Scale,
-  MapPin,
+  Ticket,
+  Sprout,
+  CheckCircle2,
 } from 'lucide-react';
 import { Badge } from '../../components/common/Badge';
 import { StatCard } from '../../components/common/StatCard';
@@ -23,6 +26,7 @@ import { LoadingState } from '../../components/common/LoadingState';
 import { DigitalSlipModal } from '../../components/common/DigitalSlipModal';
 
 export const FarmerDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { latestQueueData, joinCentreQueue } = useSocket();
 
@@ -58,18 +62,18 @@ export const FarmerDashboard: React.FC = () => {
     Boolean(overview?.liveQueueInfo?.isMyTurn);
 
   if (isLoading) {
-    return <LoadingState message="Loading your farmer dashboard..." />;
+    return <LoadingState message={t('common.loading')} />;
   }
 
   return (
     <div className="space-y-6">
-      {/* Welcome Top Banner */}
+      {/* 1. Header & Welcome */}
       <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-2xl">🌾</span>
+            <Sprout size={24} className="text-[#15803D]" />
             <h1 className="text-xl sm:text-2xl font-black text-[#1F2937] tracking-tight">
-              Namaste, {user?.name || 'Farmer'}!
+              {t('common.welcome')}, {user?.name || t('roles.FARMER')}!
             </h1>
             {profile?.farmerId && (
               <span className="bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] font-mono text-xs font-bold px-2 py-0.5 rounded-md">
@@ -82,7 +86,7 @@ export const FarmerDashboard: React.FC = () => {
             {profile?.district ? `${profile.district}, ` : ''}
             {profile?.state ? `${profile.state} ` : ''}
             {profile?.farmDetails?.landAreaAcres
-              ? `• Land Area: ${profile.farmDetails.landAreaAcres} Acres`
+              ? `• ${t('farmer.landArea')}: ${profile.farmDetails.landAreaAcres} ${t('common.quintals')}`
               : ''}
           </p>
         </div>
@@ -90,13 +94,13 @@ export const FarmerDashboard: React.FC = () => {
         <div className="flex items-center space-x-2 shrink-0">
           <Link to="/farmer/book">
             <Button variant="primary" icon={<CalendarPlus size={16} />}>
-              Book New Mandi Slot
+              {t('farmer.bookSlotBtn')}
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* TODAY'S ACTIVE BOOKING & LIVE TIMELINE CARD */}
+      {/* 2. Important Current Status / Active Booking */}
       {todayBooking ? (
         <div
           className={`rounded-2xl border p-6 sm:p-7 shadow-2xs transition-all ${
@@ -108,12 +112,12 @@ export const FarmerDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
             <div className="flex items-center space-x-3.5">
               <div className="w-12 h-12 rounded-2xl bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] flex items-center justify-center font-bold text-xl shrink-0">
-                🎟️
+                <Ticket size={24} />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs uppercase font-bold text-[#4B5563]">
-                    Today's Digital Token
+                    {t('farmer.activeBookingTitle')}
                   </span>
                   <Badge status={todayBooking.status} size="sm" />
                 </div>
@@ -126,7 +130,7 @@ export const FarmerDashboard: React.FC = () => {
             <div className="flex items-center space-x-2">
               <Link to="/farmer/live-queue">
                 <Button variant="secondary" size="sm" icon={<Radio size={14} className="animate-pulse" />}>
-                  Open Live Queue Tracker
+                  {t('common.viewQueue')}
                 </Button>
               </Link>
             </div>
@@ -140,34 +144,34 @@ export const FarmerDashboard: React.FC = () => {
           {/* Real-Time Live Status Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80 text-xs">
             <div>
-              <span className="text-[#4B5563] block font-semibold">Assigned Mandi</span>
+              <span className="text-[#4B5563] block font-semibold">{t('common.mandi')}</span>
               <span className="font-bold text-[#1F2937] text-xs block truncate mt-0.5">
-                {todayBooking.centreId?.name || 'Mandi Centre'}
+                {todayBooking.centreId?.name || t('common.mandi')}
               </span>
             </div>
 
             <div>
-              <span className="text-[#4B5563] block font-semibold">Produce Volume</span>
+              <span className="text-[#4B5563] block font-semibold">{t('common.quantity')}</span>
               <span className="font-bold text-[#1F2937] text-xs block mt-0.5">
                 {todayBooking.requestedQuantity} {todayBooking.unit} {todayBooking.cropType}
               </span>
             </div>
 
             <div>
-              <span className="text-[#4B5563] block font-semibold">Serving at Scale</span>
+              <span className="text-[#4B5563] block font-semibold">{t('storage.nowServing')}</span>
               <span className="font-bold text-[#166534] text-xs block font-mono mt-0.5">
-                Token {currentServing}
+                {t('common.token')} {currentServing}
               </span>
             </div>
 
             <div>
-              <span className="text-[#4B5563] block font-semibold">Est. Waiting Time</span>
+              <span className="text-[#4B5563] block font-semibold">{t('farmer.queuePosition')}</span>
               <span className="font-bold text-[#854D0E] text-xs block flex items-center space-x-1 mt-0.5">
                 <Clock size={13} className="text-[#EAB308]" />
                 <span>
-                  {overview?.liveQueueInfo?.estimatedWaitMinutes !== undefined
-                    ? `~${overview.liveQueueInfo.estimatedWaitMinutes} mins`
-                    : '10-15 mins'}
+                  {overview?.liveQueueInfo?.queuePosition !== undefined
+                    ? `${overview.liveQueueInfo.queuePosition} ${t('farmer.aheadOfYou')}`
+                    : '1-2 ahead'}
                 </span>
               </span>
             </div>
@@ -176,57 +180,102 @@ export const FarmerDashboard: React.FC = () => {
           {isMyTurn && (
             <div className="mt-4 p-4 bg-[#FEF9C3] text-[#854D0E] border border-[#FDE047] rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2.5">
               <Sparkles size={18} className="text-[#CA8A04] shrink-0 animate-spin" />
-              <span>
-                🔔 YOUR TURN HAS ARRIVED! Please proceed immediately to Weighbridge Scale 1 at{' '}
-                {todayBooking.centreId?.name}.
-              </span>
+              <span>{t('farmer.turnNowAlert')}</span>
             </div>
           )}
         </div>
       ) : (
         <EmptyState
           icon={<CalendarPlus size={24} />}
-          title="No Procurement Booked for Today"
-          description="Book an official time slot at your nearest Mandi before traveling to eliminate queue waiting times."
-          actionText="Book Next Procurement Slot"
+          title={t('farmer.noActiveBooking')}
+          description={t('farmer.noActiveBookingDesc')}
+          actionText={t('farmer.bookSlotBtn')}
           onAction={() => window.location.assign('/farmer/book')}
         />
       )}
 
-      {/* Metric Stats Cards */}
-      <div className="grid sm:grid-cols-3 gap-4">
+      {/* 3. Quick Actions Bar */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Link
+          to="/farmer/book"
+          className="p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-3.5 transition group shadow-2xs cursor-pointer"
+        >
+          <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC] flex items-center justify-center font-bold">
+            <CalendarPlus size={18} />
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-[#1F2937] group-hover:text-[#15803D] transition">
+              {t('nav.bookSlot')}
+            </h4>
+            <p className="text-[11px] text-[#4B5563]">{t('farmer.wizardTitle')}</p>
+          </div>
+        </Link>
+
+        <Link
+          to="/farmer/history"
+          className="p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-3.5 transition group shadow-2xs cursor-pointer"
+        >
+          <div className="w-10 h-10 rounded-xl bg-[#E0F2FE] text-[#0369A1] border border-[#7DD3FC] flex items-center justify-center font-bold">
+            <FileText size={18} />
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-[#1F2937] group-hover:text-[#0369A1] transition">
+              {t('nav.myBookings')}
+            </h4>
+            <p className="text-[11px] text-[#4B5563]">{t('farmer.totalBookings')}</p>
+          </div>
+        </Link>
+
+        <Link
+          to="/farmer/live-queue"
+          className="p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-3.5 transition group shadow-2xs cursor-pointer"
+        >
+          <div className="w-10 h-10 rounded-xl bg-[#FEF9C3] text-[#854D0E] border border-[#FDE047] flex items-center justify-center font-bold">
+            <Radio size={18} />
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-[#1F2937] group-hover:text-[#854D0E] transition">
+              {t('nav.myQueue')}
+            </h4>
+            <p className="text-[11px] text-[#4B5563]">{t('storage.liveQueueTitle')}</p>
+          </div>
+        </Link>
+      </div>
+
+      {/* 4. Key Statistics Cards (Responsive: 3 on desktop/tablet, 1 on mobile) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
-          title="Total Produce Procured"
-          value={`${overview?.totalQuantityQuintals || 0} Quintals`}
+          title={t('farmer.totalProcured')}
+          value={`${overview?.totalQuantityQuintals || 0} ${t('common.quintals')}`}
           subtitle="Direct Mandi weighbridge records"
           icon={<Scale size={18} />}
           color="green"
         />
 
         <StatCard
-          title="Total MSP DBT Transferred"
+          title={t('farmer.dbtEarnings')}
           value={`₹${(overview?.totalIncomeINR || 0).toLocaleString('en-IN')}`}
-          subtitle="Direct Aadhaar bank transfer"
+          subtitle={t('farmer.disbursed')}
           icon={<span className="text-base font-bold">₹</span>}
           color="amber"
         />
 
         <StatCard
-          title="Completed Transactions"
+          title={t('farmer.totalBookings')}
           value={overview?.pastProcurementsCount || 0}
           subtitle="Verified e-Procurement receipts"
-          icon={<FileText size={18} />}
+          icon={<CheckCircle2 size={18} />}
           color="blue"
         />
       </div>
 
-      {/* Recent Completed Slips */}
+      {/* 5. Recent Mandi Procurement Receipts */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <FileText size={18} className="text-[#15803D]" />
             <h3 className="font-bold text-sm sm:text-base text-[#1F2937]">
-              Recent Mandi Procurement Receipts
+              {t('farmer.recentProcurements')}
             </h3>
           </div>
           {overview?.recentProcurements?.length > 0 && (
@@ -234,7 +283,7 @@ export const FarmerDashboard: React.FC = () => {
               to="/farmer/history"
               className="text-xs font-bold text-[#15803D] hover:text-[#166534] hover:underline flex items-center space-x-0.5"
             >
-              <span>View All</span>
+              <span>{t('common.viewAll')}</span>
               <ArrowRight size={14} />
             </Link>
           )}
@@ -243,18 +292,18 @@ export const FarmerDashboard: React.FC = () => {
         {overview?.recentProcurements?.length > 0 ? (
           <div className="divide-y divide-slate-100">
             {overview.recentProcurements.map((proc: IProcurement) => (
-              <div key={proc._id} className="py-3.5 flex items-center justify-between text-xs sm:text-sm">
+              <div key={proc._id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
                 <div className="space-y-0.5">
                   <div className="flex items-center space-x-2">
                     <span className="font-bold text-[#1F2937]">{proc.cropType}</span>
                     <Badge status={proc.qualityGrade} size="sm" />
                   </div>
                   <p className="text-[#4B5563] text-xs">
-                    Qty: <strong>{proc.actualQuantity} {proc.unit}</strong> • Moisture: {proc.moisturePercent}% • {new Date(proc.timestamp).toLocaleDateString('en-IN')}
+                    {t('common.quantity')}: <strong>{proc.actualQuantity} {proc.unit}</strong> • {t('storage.moisturePercent')}: {proc.moisturePercent}% • {new Date(proc.timestamp).toLocaleDateString('en-IN')}
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-between sm:justify-end space-x-3">
                   <span className="font-extrabold text-[#166534] text-sm sm:text-base">
                     ₹{proc.totalPayout.toLocaleString('en-IN')}
                   </span>
@@ -263,7 +312,7 @@ export const FarmerDashboard: React.FC = () => {
                     size="sm"
                     onClick={() => setSelectedSlip(proc)}
                   >
-                    View Slip
+                    {t('common.view')}
                   </Button>
                 </div>
               </div>
@@ -271,13 +320,13 @@ export const FarmerDashboard: React.FC = () => {
           </div>
         ) : (
           <EmptyState
-            title="No procurement transactions recorded yet"
-            description="Completed procurement receipts and DBT payment slips will be archived here."
+            title={t('farmer.noProcurements')}
+            description={t('farmer.noActiveBookingDesc')}
           />
         )}
       </div>
 
-      {/* Slip Modal */}
+      {/* Digital Slip Modal */}
       <DigitalSlipModal procurement={selectedSlip} onClose={() => setSelectedSlip(null)} />
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { queueApi, bookingsApi, centresApi } from '../../services/api';
@@ -10,9 +11,10 @@ import {
   Radio,
   Scale,
   ArrowRight,
-  Inbox,
   Clock,
   Megaphone,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { Badge } from '../../components/common/Badge';
 import { StatCard } from '../../components/common/StatCard';
@@ -22,14 +24,16 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { LoadingState } from '../../components/common/LoadingState';
 
 export const StorageDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { user, centre: userCentre } = useAuth();
   const { joinCentreQueue, latestQueueData } = useSocket();
 
   const [activeCentre, setActiveCentre] = useState<IProcurementCentre | null>(userCentre);
-  const [allCentres, setAllCentres] = useState<IProcurementCentre[]>([]);
   const [queueData, setQueueData] = useState<ILiveQueueSummary | null>(null);
   const [todayBookings, setTodayBookings] = useState<IBooking[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isCalling, setIsCalling] = useState<boolean>(false);
+  const [callMessage, setCallMessage] = useState<string>('');
 
   // Load centres if not already populated on user profile
   useEffect(() => {
@@ -38,7 +42,6 @@ export const StorageDashboard: React.FC = () => {
         if (!activeCentre) {
           const res = await centresApi.getCentres();
           if (res.data.success && res.data.data.length > 0) {
-            setAllCentres(res.data.data);
             setActiveCentre(res.data.data[0]);
           }
         }
@@ -85,21 +88,37 @@ export const StorageDashboard: React.FC = () => {
     }
   }, [latestQueueData, centreId]);
 
+  const handleCallNext = async () => {
+    if (!centreId) return;
+    setIsCalling(true);
+    setCallMessage('');
+    try {
+      const res = await queueApi.callNext(centreId);
+      if (res.data.success) {
+        setCallMessage(res.data.message || 'Next farmer called to Weighbridge Scale 1.');
+        fetchData();
+      }
+    } catch (err: any) {
+      setCallMessage(err.response?.data?.message || 'No arrived farmers waiting in queue to call.');
+    } finally {
+      setIsCalling(false);
+    }
+  };
+
   const completed = queueData?.completedCount || 0;
   const arrived = queueData?.arrivedCount || 0;
-  const noShows = queueData?.noShowCount || 0;
   const currentToken = queueData?.currentServingToken || 'None';
 
   if (isLoading) {
-    return <LoadingState message="Loading Mandi operations & live queues..." />;
+    return <LoadingState message={t('common.loading')} />;
   }
 
   if (!activeCentre) {
     return (
       <EmptyState
         icon={<Building2 size={28} />}
-        title="No Assigned Mandi Found"
-        description="Your account is not assigned to an active procurement centre. Please contact the administrator."
+        title={t('empty.noCentres')}
+        description={t('storage.noProcurementToday')}
       />
     );
   }
@@ -108,8 +127,8 @@ export const StorageDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Mandi Yard Header */}
       <PageHeader
-        title={activeCentre?.name || 'Mandi Operations'}
-        description={`${activeCentre?.address} • Operating Hours: ${activeCentre?.operatingHours.open} - ${activeCentre?.operatingHours.close} • Daily Capacity: ${activeCentre?.capacityPerDay || 0} Qtl`}
+        title={activeCentre?.name || t('storage.dashboardTitle')}
+        description={`${activeCentre?.address} • ${t('common.time')}: ${activeCentre?.operatingHours.open} - ${activeCentre?.operatingHours.close} • ${t('storage.availableCapacity')}: ${activeCentre?.capacityPerDay || 0} ${t('common.quintals')}`}
         icon={<Building2 size={24} />}
         badge={
           activeCentre?.centreCode ? (
@@ -119,22 +138,41 @@ export const StorageDashboard: React.FC = () => {
           ) : undefined
         }
         actions={
-          <Link to="/storage/queue-desk">
+          <div className="flex items-center space-x-2">
             <Button
               variant="primary"
               size="md"
-              icon={<Radio size={15} className="animate-pulse" />}
+              onClick={handleCallNext}
+              disabled={isCalling}
+              isLoading={isCalling}
+              icon={<Megaphone size={16} />}
             >
-              Open Live Queue Desk
+              {t('storage.callNextBtn')}
             </Button>
-          </Link>
+            <Link to="/storage/queue-desk">
+              <Button
+                variant="secondary"
+                size="md"
+                icon={<Radio size={15} className="animate-pulse text-[#15803D]" />}
+              >
+                {t('nav.liveQueue')}
+              </Button>
+            </Link>
+          </div>
         }
       />
 
-      {/* Metrics Row */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {callMessage && (
+        <div className="p-4 bg-emerald-50 border border-[#86EFAC] text-[#166534] rounded-2xl text-xs sm:text-sm font-bold flex items-center space-x-2 animate-fadeIn">
+          <CheckCircle2 size={18} className="text-[#15803D] shrink-0" />
+          <span>{callMessage}</span>
+        </div>
+      )}
+
+      {/* Operational Metrics Row (4 Responsive Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Now Serving Token"
+          title={t('storage.nowServing')}
           value={currentToken}
           subtitle="At Scale Weighbridge 1"
           icon={<Megaphone size={18} />}
@@ -142,27 +180,27 @@ export const StorageDashboard: React.FC = () => {
         />
 
         <StatCard
-          title="Arrived at Gate"
+          title={t('storage.waitingGate')}
           value={arrived}
-          subtitle="Checked in and waiting"
+          subtitle="Checked in and waiting in yard"
           icon={<Users size={18} />}
           color="blue"
         />
 
         <StatCard
-          title="Procurement Done"
+          title={t('storage.completedToday')}
           value={completed}
-          subtitle="Receipts issued today"
+          subtitle="Verified weighbridge slips issued"
           icon={<Scale size={18} />}
           color="green"
         />
 
         <StatCard
-          title="No-Shows / Vacant"
-          value={noShows}
-          subtitle="Reallocated to waitlist"
+          title={t('storage.todaysBookings')}
+          value={todayBookings.length}
+          subtitle="Total farmer slots reserved"
           icon={<Clock size={18} />}
-          color="rose"
+          color="slate"
         />
       </div>
 
@@ -172,14 +210,14 @@ export const StorageDashboard: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Users size={18} className="text-[#15803D]" />
             <h3 className="font-bold text-sm sm:text-base text-[#1F2937]">
-              Today's Scheduled & Arrived Farmers
+              {t('storage.todaysBookings')} ({todayBookings.length})
             </h3>
           </div>
           <Link
             to="/storage/queue-desk"
             className="text-xs font-bold text-[#15803D] hover:text-[#166534] hover:underline flex items-center space-x-1"
           >
-            <span>Launch Live Calling Desk</span>
+            <span>{t('storage.liveQueueTitle')}</span>
             <ArrowRight size={14} />
           </Link>
         </div>
@@ -188,12 +226,12 @@ export const StorageDashboard: React.FC = () => {
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-slate-50 text-[#1F2937] font-extrabold border-b border-slate-200">
               <tr>
-                <th className="p-3.5">Token #</th>
+                <th className="p-3.5">{t('common.token')}</th>
                 <th className="p-3.5">Farmer Name</th>
-                <th className="p-3.5">Crop Produce</th>
-                <th className="p-3.5">Slot Time</th>
-                <th className="p-3.5">Status</th>
-                <th className="p-3.5 text-right">Action</th>
+                <th className="p-3.5">{t('common.crop')}</th>
+                <th className="p-3.5">{t('common.time')}</th>
+                <th className="p-3.5">{t('common.status')}</th>
+                <th className="p-3.5 text-right">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -201,8 +239,8 @@ export const StorageDashboard: React.FC = () => {
                 <tr>
                   <td colSpan={6} className="p-8">
                     <EmptyState
-                      title="No bookings scheduled for today"
-                      description="Farmers who book procurement slots for today will appear here."
+                      title={t('storage.noProcurementToday')}
+                      description={t('farmer.noActiveBookingDesc')}
                     />
                   </td>
                 </tr>
@@ -227,7 +265,7 @@ export const StorageDashboard: React.FC = () => {
                       {b.status === 'PROCESSING' && (
                         <Link to="/storage/procurement">
                           <Button variant="primary" size="sm" icon={<Scale size={13} />}>
-                            Weigh Produce
+                            {t('storage.completeWeighmentBtn')}
                           </Button>
                         </Link>
                       )}

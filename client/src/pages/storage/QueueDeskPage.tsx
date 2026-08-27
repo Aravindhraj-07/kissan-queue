@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { queueApi, bookingsApi, centresApi } from '../../services/api';
@@ -20,6 +21,7 @@ import { Button } from '../../components/common/Button';
 import { EmptyState } from '../../components/common/EmptyState';
 
 export const QueueDeskPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user, centre: userCentre } = useAuth();
   const { joinCentreQueue, latestQueueData } = useSocket();
   const navigate = useNavigate();
@@ -132,7 +134,7 @@ export const QueueDeskPage: React.FC = () => {
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Header Bar */}
       <PageHeader
-        title="Mandi Live Queue Operator Desk"
+        title={t('storage.liveQueueTitle')}
         description={`${activeCentre?.name || 'Mandi Yard'} • Manage gate check-ins, broadcast token calls to weighbridge, and handle arrivals.`}
         icon={<Radio size={24} />}
         actions={
@@ -144,7 +146,7 @@ export const QueueDeskPage: React.FC = () => {
             isLoading={isCalling}
             icon={<Volume2 size={18} />}
           >
-            Call Next Farmer
+            {t('storage.callNextBtn')}
           </Button>
         }
       />
@@ -170,7 +172,7 @@ export const QueueDeskPage: React.FC = () => {
 
             <div>
               <span className="text-xs text-emerald-200 uppercase font-bold tracking-wider">
-                Current Serving Token:
+                {t('storage.nowServing')}:
               </span>
               <h2 className="text-4xl sm:text-5xl font-black font-mono text-[#FDE047] mt-1 tracking-tight">
                 {currentToken}
@@ -188,7 +190,7 @@ export const QueueDeskPage: React.FC = () => {
                   <span className="font-mono text-emerald-100">{currentProcessing.farmerId?.phone}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-emerald-200">Produce:</span>
+                  <span className="text-emerald-200">{t('common.crop')}:</span>
                   <span className="font-bold text-[#FDE047]">
                     {currentProcessing.requestedQuantity} {currentProcessing.unit} {currentProcessing.cropType}
                   </span>
@@ -196,7 +198,7 @@ export const QueueDeskPage: React.FC = () => {
               </div>
             ) : (
               <p className="text-xs text-emerald-200 py-3 font-medium">
-                No token currently being processed at weighbridge. Click "Call Next Farmer" above.
+                No token currently being processed at weighbridge. Click "{t('storage.callNextBtn')}" above.
               </p>
             )}
 
@@ -208,7 +210,7 @@ export const QueueDeskPage: React.FC = () => {
                 className="w-full"
                 icon={<Scale size={16} />}
               >
-                Enter Scale & Quality Inspection
+                {t('storage.completeWeighmentBtn')}
               </Button>
             )}
           </div>
@@ -220,7 +222,7 @@ export const QueueDeskPage: React.FC = () => {
             <div className="flex items-center space-x-2">
               <Users size={18} className="text-[#15803D]" />
               <h3 className="text-sm sm:text-base font-extrabold text-[#1F2937]">
-                Gate Arrivals & Live Queue List ({todayBookings.length})
+                {t('storage.liveQueueTitle')} ({todayBookings.length})
               </h3>
             </div>
             <span className="text-xs font-bold text-[#4B5563]">Real-Time Sync</span>
@@ -229,7 +231,7 @@ export const QueueDeskPage: React.FC = () => {
           <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
             {todayBookings.length === 0 ? (
               <EmptyState
-                title="No bookings in today's queue"
+                title={t('storage.noProcurementToday')}
                 description="Farmers scheduled for today will display here for gate check-in."
               />
             ) : (
@@ -249,7 +251,7 @@ export const QueueDeskPage: React.FC = () => {
                       {b.farmerId?.name} ({b.farmerId?.phone}) • {b.requestedQuantity} {b.unit} {b.cropType}
                     </p>
                     <p className="text-[11px] text-[#4B5563]">
-                      Slot: {b.slotId ? `${b.slotId.startTime} - ${b.slotId.endTime}` : '—'}
+                      {t('common.time')}: {b.slotId ? `${b.slotId.startTime} - ${b.slotId.endTime}` : '—'}
                     </p>
                   </div>
 
@@ -261,7 +263,7 @@ export const QueueDeskPage: React.FC = () => {
                         onClick={() => handleMarkArrived(b._id)}
                         icon={<UserCheck size={13} />}
                       >
-                        Gate Check-In
+                        {t('storage.checkInBtn')}
                       </Button>
                     )}
 
@@ -272,7 +274,7 @@ export const QueueDeskPage: React.FC = () => {
                         onClick={() => handleMarkNoShow(b._id)}
                         title="Reallocate slot if farmer does not arrive"
                       >
-                        No-Show
+                        {t('storage.markNoShowBtn')}
                       </Button>
                     )}
                   </div>

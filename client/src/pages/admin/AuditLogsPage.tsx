@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminApi } from '../../services/api';
 import { IAuditLog } from '../../types';
 import { ScrollText, RefreshCw } from 'lucide-react';
@@ -8,6 +9,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { LoadingState } from '../../components/common/LoadingState';
 
 export const AuditLogsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<IAuditLog[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
@@ -37,7 +39,7 @@ export const AuditLogsPage: React.FC = () => {
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Page Header */}
       <PageHeader
-        title="Immutable System Audit Trail"
+        title={t('admin.auditTrailTitle')}
         description="Cryptographically timestamped operational log of all bookings, cancellations, token calls, weighments, and dispatches."
         icon={<ScrollText size={24} />}
         actions={
@@ -56,15 +58,15 @@ export const AuditLogsPage: React.FC = () => {
       {/* Logs Table */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
         {isLoading ? (
-          <LoadingState message="Loading immutable audit logs..." />
+          <LoadingState message={t('common.loading')} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm font-mono">
               <thead className="bg-slate-50 text-[#1F2937] font-sans font-extrabold border-b border-slate-200">
                 <tr>
-                  <th className="p-4">Timestamp (IST)</th>
-                  <th className="p-4">Actor</th>
-                  <th className="p-4">Action Executed</th>
+                  <th className="p-4">{t('admin.timestamp')} (IST)</th>
+                  <th className="p-4">{t('admin.actor')}</th>
+                  <th className="p-4">{t('admin.action')}</th>
                   <th className="p-4">Target Entity</th>
                   <th className="p-4">Metadata Snapshot</th>
                 </tr>
@@ -74,7 +76,7 @@ export const AuditLogsPage: React.FC = () => {
                   <tr>
                     <td colSpan={5} className="p-8">
                       <EmptyState
-                        title="No audit records found"
+                        title={t('empty.noRecords')}
                         description="Audit logs are logged whenever system events take place."
                       />
                     </td>
@@ -90,7 +92,7 @@ export const AuditLogsPage: React.FC = () => {
                           {log.actorName}
                         </span>
                         <span className="text-[10px] bg-slate-100 text-[#4B5563] font-bold px-1.5 py-0.5 rounded font-sans border border-slate-200">
-                          {log.actorRole}
+                          {t(`roles.${log.actorRole}`, { defaultValue: log.actorRole })}
                         </span>
                       </td>
                       <td className="p-4">
@@ -98,42 +100,17 @@ export const AuditLogsPage: React.FC = () => {
                           {log.action}
                         </span>
                       </td>
-                      <td className="p-4 text-[#1F2937] font-semibold">{log.entityType}</td>
-                      <td className="p-4 text-[#4B5563] text-xs max-w-xs truncate font-mono">
-                        {JSON.stringify(log.metadata || {})}
+                      <td className="p-4 text-[#4B5563] font-sans text-xs font-semibold">
+                        {log.entityType}
+                      </td>
+                      <td className="p-4 text-xs text-[#4B5563] max-w-xs truncate">
+                        {log.metadata ? JSON.stringify(log.metadata) : '—'}
                       </td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
-          </div>
-        )}
-
-        {/* Pagination Bar */}
-        {totalPages > 1 && (
-          <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between font-sans text-xs sm:text-sm">
-            <span className="text-[#4B5563] font-semibold">
-              Page {page} of {totalPages}
-            </span>
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => fetchLogs(page - 1)}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages}
-                onClick={() => fetchLogs(page + 1)}
-              >
-                Next
-              </Button>
-            </div>
           </div>
         )}
       </div>

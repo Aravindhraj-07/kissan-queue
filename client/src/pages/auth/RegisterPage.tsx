@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { User, Phone, Lock, MapPin, Sprout, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { Button } from '../../components/common/Button';
+import { LanguageSelector } from '../../components/common/LanguageSelector';
 
 export const RegisterPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { register, isLoading } = useAuth();
 
@@ -44,15 +47,20 @@ export const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {/* Top Language Bar */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-8">
+        <LanguageSelector variant="header" />
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#15803D] text-white font-black text-2xl shadow-xs border border-emerald-600">
           PX
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-[#1F2937] tracking-tight">
-          Farmer Registration Portal
+          {t('auth.registerTitle')}
         </h2>
         <p className="text-xs sm:text-sm text-[#4B5563] font-medium">
-          Register to book procurement slots and track digital queue tokens
+          {t('auth.registerSubtitle')}
         </p>
       </div>
 
@@ -69,7 +77,7 @@ export const RegisterPage: React.FC = () => {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
-                  Farmer Full Name *
+                  {t('auth.fullName')} *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#4B5563]">
@@ -80,7 +88,7 @@ export const RegisterPage: React.FC = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="e.g. Ramesh Kumar"
+                    placeholder="e.g. Sardar Gurpreet Singh"
                     className="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
                     required
                   />
@@ -89,19 +97,19 @@ export const RegisterPage: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
-                  Mobile Number (for SMS Tokens) *
+                  {t('auth.mobileNumber')} *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#4B5563]">
                     <Phone size={16} />
                   </div>
                   <input
-                    type="text"
+                    type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="e.g. 9876543210"
-                    className="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
+                    placeholder="e.g. 9876500001"
+                    className="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none font-mono"
                     required
                   />
                 </div>
@@ -109,7 +117,9 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#1F2937] mb-1.5">Password *</label>
+              <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
+                {t('auth.passwordLabel')} *
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#4B5563]">
                   <Lock size={16} />
@@ -119,68 +129,69 @@ export const RegisterPage: React.FC = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Create a secure password"
+                  placeholder="••••••••"
                   className="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
                   required
                 />
               </div>
             </div>
 
-            <div className="border-t border-slate-100 pt-4 space-y-2">
-              <p className="text-xs font-extrabold text-[#166534] flex items-center space-x-1.5">
-                <MapPin size={15} />
-                <span>Farm Location Details</span>
-              </p>
-              <div className="grid sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-[#4B5563] mb-1">Village</label>
-                  <input
-                    type="text"
-                    name="village"
-                    value={formData.village}
-                    onChange={handleChange}
-                    placeholder="e.g. Taraori"
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#4B5563] mb-1">District</label>
-                  <input
-                    type="text"
-                    name="district"
-                    value={formData.district}
-                    onChange={handleChange}
-                    placeholder="e.g. Karnal"
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#4B5563] mb-1">State</label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    placeholder="e.g. Haryana"
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
-                  />
-                </div>
+            <div className="grid sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
+                  {t('auth.village')}
+                </label>
+                <input
+                  type="text"
+                  name="village"
+                  value={formData.village}
+                  onChange={handleChange}
+                  placeholder="Village / Town"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
+                  {t('auth.district')}
+                </label>
+                <input
+                  type="text"
+                  name="district"
+                  value={formData.district}
+                  onChange={handleChange}
+                  placeholder="District"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
+                  {t('auth.state')}
+                </label>
+                <input
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  placeholder="State"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
+                />
               </div>
             </div>
 
-            <div className="pt-2">
-              <label className="block text-xs font-semibold text-[#4B5563] mb-1.5 flex items-center space-x-1.5">
-                <Sprout size={15} className="text-[#15803D]" />
-                <span>Total Farm Land Area (in Acres)</span>
+            <div>
+              <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
+                {t('auth.landArea')}
               </label>
               <input
                 type="number"
                 name="landAreaAcres"
                 value={formData.landAreaAcres}
                 onChange={handleChange}
-                placeholder="e.g. 5"
-                step="0.5"
-                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
+                placeholder="e.g. 5.5"
+                step="0.1"
+                className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none font-mono"
               />
             </div>
 
@@ -191,23 +202,23 @@ export const RegisterPage: React.FC = () => {
               disabled={isLoading}
               isLoading={isLoading}
               icon={<ArrowRight size={16} />}
-              className="w-full mt-3"
+              className="w-full mt-2"
             >
-              Complete Registration & Enter
+              {t('auth.registerTitle')}
             </Button>
           </form>
 
-          <div className="pt-4 border-t border-slate-100 text-center text-xs sm:text-sm text-[#4B5563]">
-            Already registered?{' '}
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm">
+            <span className="text-[#4B5563]">{t('auth.alreadyRegistered')}</span>
             <Link to="/login" className="font-bold text-[#15803D] hover:text-[#166534] hover:underline">
-              Sign In here
+              {t('auth.loginLink')}
             </Link>
           </div>
         </div>
 
         <div className="mt-6 text-center text-xs text-[#4B5563] flex items-center justify-center space-x-1.5 font-medium">
           <ShieldCheck size={16} className="text-[#15803D]" />
-          <span>Aadhaar Verified • Ministry of Agriculture Certified</span>
+          <span>{t('app.encrypted')}</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { bookingsApi, procurementApi, centresApi } from '../../services/api';
 import { IBooking, IProcurement, IProcurementCentre } from '../../types';
@@ -10,6 +11,7 @@ import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
 
 export const ProcurementWeighPage: React.FC = () => {
+  const { t } = useTranslation();
   const { centre: userCentre } = useAuth();
   const navigate = useNavigate();
 
@@ -106,7 +108,7 @@ export const ProcurementWeighPage: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Page Header */}
       <PageHeader
-        title="Weighbridge Scale & Quality Inspection"
+        title={t('storage.procurementScaleTitle')}
         description={`${activeCentre?.name ? `${activeCentre.name} • ` : ''}Record verified weighbridge scale readings, moisture percentage, and issue official digital e-Procurement slips.`}
         icon={<Scale size={24} />}
       />
@@ -156,7 +158,7 @@ export const ProcurementWeighPage: React.FC = () => {
           {/* Actual Quantity Scale Input */}
           <div>
             <label className="block text-xs font-extrabold text-[#4B5563] uppercase tracking-wider mb-1.5">
-              Net Weighbridge Scale Reading (in Quintals) *
+              {t('storage.netWeight')} *
             </label>
             <div className="flex items-center space-x-3">
               <input
@@ -168,14 +170,14 @@ export const ProcurementWeighPage: React.FC = () => {
                 className="w-48 border border-slate-300 rounded-xl px-4 py-2.5 text-sm sm:text-base font-extrabold text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
                 required
               />
-              <span className="text-xs sm:text-sm font-bold text-[#4B5563]">Quintals Net Weight</span>
+              <span className="text-xs sm:text-sm font-bold text-[#4B5563]">{t('common.quintals')}</span>
             </div>
           </div>
 
           {/* Moisture and Grade */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#4B5563] mb-1.5">Moisture Level (%)</label>
+              <label className="block text-xs font-bold text-[#4B5563] mb-1.5">{t('storage.moisturePercent')}</label>
               <input
                 type="number"
                 step="0.1"
@@ -189,7 +191,7 @@ export const ProcurementWeighPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#4B5563] mb-1.5">Quality Grade</label>
+              <label className="block text-xs font-bold text-[#4B5563] mb-1.5">{t('storage.qualityGrade')}</label>
               <select
                 value={qualityGrade}
                 onChange={(e: any) => setQualityGrade(e.target.value)}
@@ -206,7 +208,7 @@ export const ProcurementWeighPage: React.FC = () => {
           {/* MSP Rate */}
           <div>
             <label className="block text-xs font-bold text-[#4B5563] mb-1.5">
-              Government MSP Rate (₹ / Quintal)
+              {t('storage.mspPrice')} (₹ / {t('common.quintals')})
             </label>
             <input
               type="number"
@@ -221,11 +223,11 @@ export const ProcurementWeighPage: React.FC = () => {
         <div className="md:col-span-5 space-y-5 flex flex-col justify-between">
           <div className="bg-[#14532D] text-white p-6 sm:p-7 rounded-3xl border border-[#166534] shadow-md space-y-4">
             <span className="text-[11px] font-black text-[#86EFAC] uppercase tracking-widest">
-              Direct Benefit Transfer Payout
+              {t('digitalSlip.dbtSummary')}
             </span>
 
             <div>
-              <p className="text-xs text-emerald-200 font-semibold">Total Calculated Amount</p>
+              <p className="text-xs text-emerald-200 font-semibold">{t('storage.totalPayout')}</p>
               <h3 className="text-3xl sm:text-4xl font-black text-[#FDE047] mt-1 tracking-tight">
                 ₹{totalPayout.toLocaleString('en-IN')}
               </h3>
@@ -236,15 +238,15 @@ export const ProcurementWeighPage: React.FC = () => {
 
             <div className="border-t border-[#166534] pt-3 space-y-2 text-xs text-emerald-100 font-medium">
               <div className="flex justify-between">
-                <span className="text-emerald-300">Selected Crop:</span>
+                <span className="text-emerald-300">{t('common.crop')}:</span>
                 <strong className="text-white">{selectedBooking?.cropType || 'Produce'}</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-emerald-300">Verified Grade:</span>
+                <span className="text-emerald-300">{t('storage.qualityGrade')}:</span>
                 <strong className="text-white">{qualityGrade}</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-emerald-300">Moisture Reading:</span>
+                <span className="text-emerald-300">{t('storage.moisturePercent')}:</span>
                 <strong className="text-white">{moisturePercent}%</strong>
               </div>
             </div>
@@ -259,7 +261,7 @@ export const ProcurementWeighPage: React.FC = () => {
             icon={<Sparkles size={18} />}
             className="w-full"
           >
-            Complete Procurement & Issue Slip
+            {t('storage.completeWeighmentBtn')}
           </Button>
         </div>
       </form>

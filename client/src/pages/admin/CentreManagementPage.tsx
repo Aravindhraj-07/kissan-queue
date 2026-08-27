@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { centresApi } from '../../services/api';
 import { IProcurementCentre } from '../../types';
 import { Building2, Plus, Phone, Inbox, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -8,6 +9,7 @@ import { Button } from '../../components/common/Button';
 import { EmptyState } from '../../components/common/EmptyState';
 
 export const CentreManagementPage: React.FC = () => {
+  const { t } = useTranslation();
   const [centres, setCentres] = useState<IProcurementCentre[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newCentre, setNewCentre] = useState({
@@ -69,7 +71,7 @@ export const CentreManagementPage: React.FC = () => {
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <PageHeader
-        title="Procurement Centres & Mandis"
+        title={t('admin.manageCentres')}
         description="Manage physical Mandi yards, GPS coordinates, daily limits, and assigned staff."
         icon={<Building2 size={24} />}
         actions={
@@ -120,7 +122,7 @@ export const CentreManagementPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-bold text-[#1F2937] mb-1">District *</label>
+              <label className="block font-bold text-[#1F2937] mb-1">{t('auth.district')} *</label>
               <input
                 type="text"
                 value={newCentre.district}
@@ -131,7 +133,7 @@ export const CentreManagementPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-bold text-[#1F2937] mb-1">State *</label>
+              <label className="block font-bold text-[#1F2937] mb-1">{t('auth.state')} *</label>
               <input
                 type="text"
                 value={newCentre.state}
@@ -159,14 +161,14 @@ export const CentreManagementPage: React.FC = () => {
               size="sm"
               onClick={() => setIsAdding(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
               variant="primary"
               size="sm"
             >
-              Save Centre
+              {t('common.save')}
             </Button>
           </div>
         </form>
@@ -176,7 +178,7 @@ export const CentreManagementPage: React.FC = () => {
       {centres.length === 0 ? (
         <EmptyState
           icon={<Building2 size={24} />}
-          title="No procurement centres registered"
+          title={t('empty.noCentres')}
           description="Register your first Mandi yard by clicking 'Add New Mandi' above."
           actionText="Add New Mandi"
           onAction={() => setIsAdding(true)}
@@ -199,7 +201,7 @@ export const CentreManagementPage: React.FC = () => {
                 <div className="pt-2.5 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs sm:text-sm text-[#1F2937]">
                   <div>
                     <span className="text-[#4B5563] block text-xs">Daily Capacity:</span>
-                    <strong>{c.capacityPerDay} Quintals</strong>
+                    <strong>{c.capacityPerDay} {t('common.quintals')}</strong>
                   </div>
                   <div>
                     <span className="text-[#4B5563] block text-xs">Operating Hours:</span>

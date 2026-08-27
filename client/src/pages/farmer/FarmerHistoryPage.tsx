@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { bookingsApi, procurementApi } from '../../services/api';
 import { IBooking, IProcurement } from '../../types';
 import { FileText, Calendar, XCircle, Printer, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -10,6 +11,7 @@ import { LoadingState } from '../../components/common/LoadingState';
 import { DigitalSlipModal } from '../../components/common/DigitalSlipModal';
 
 export const FarmerHistoryPage: React.FC = () => {
+  const { t } = useTranslation();
   const [bookings, setBookings] = useState<IBooking[]>([]);
   const [procurements, setProcurements] = useState<IProcurement[]>([]);
   const [activeTab, setActiveTab] = useState<'BOOKINGS' | 'SLIPS'>('BOOKINGS');
@@ -54,14 +56,14 @@ export const FarmerHistoryPage: React.FC = () => {
   };
 
   if (isLoading) {
-    return <LoadingState message="Loading your tokens and receipts..." />;
+    return <LoadingState message={t('common.loading')} />;
   }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <PageHeader
-        title="Bookings & Procurement Receipts"
+        title={t('nav.myBookings')}
         description="View your digital token histories, download official MSP payout receipts, and manage scheduled Mandi bookings."
         icon={<FileText size={24} />}
         actions={
@@ -74,7 +76,7 @@ export const FarmerHistoryPage: React.FC = () => {
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
-              All Bookings ({bookings.length})
+              {t('farmer.totalBookings')} ({bookings.length})
             </button>
             <button
               onClick={() => setActiveTab('SLIPS')}
@@ -84,7 +86,7 @@ export const FarmerHistoryPage: React.FC = () => {
                   : 'text-[#4B5563] hover:text-[#1F2937]'
               }`}
             >
-              Procurement Slips ({procurements.length})
+              {t('nav.procurement')} ({procurements.length})
             </button>
           </div>
         }
@@ -110,12 +112,12 @@ export const FarmerHistoryPage: React.FC = () => {
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className="bg-slate-50 text-[#1F2937] font-extrabold border-b border-slate-200">
                 <tr>
-                  <th className="p-4">Token / ID</th>
-                  <th className="p-4">Mandi Centre</th>
-                  <th className="p-4">Produce</th>
-                  <th className="p-4">Scheduled Slot</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className="p-4">{t('common.token')}</th>
+                  <th className="p-4">{t('common.mandi')}</th>
+                  <th className="p-4">{t('common.crop')}</th>
+                  <th className="p-4">{t('common.time')}</th>
+                  <th className="p-4">{t('common.status')}</th>
+                  <th className="p-4 text-right">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -123,9 +125,9 @@ export const FarmerHistoryPage: React.FC = () => {
                   <tr>
                     <td colSpan={6} className="p-8">
                       <EmptyState
-                        title="No bookings found"
-                        description="You haven't made any Mandi slot bookings yet."
-                        actionText="Book New Slot"
+                        title={t('empty.noBookings')}
+                        description={t('farmer.noActiveBookingDesc')}
+                        actionText={t('farmer.bookSlotBtn')}
                         onAction={() => window.location.assign('/farmer/book')}
                       />
                     </td>
@@ -165,7 +167,7 @@ export const FarmerHistoryPage: React.FC = () => {
                               size="sm"
                               onClick={() => handleCancelBooking(b._id)}
                             >
-                              Cancel
+                              {t('common.cancel')}
                             </Button>
                           )}
                         </td>
@@ -183,8 +185,8 @@ export const FarmerHistoryPage: React.FC = () => {
           {procurements.length === 0 ? (
             <div className="col-span-2">
               <EmptyState
-                title="No completed procurement receipts found yet"
-                description="When your harvest is weighed at the Mandi weighbridge, your official e-receipt will be generated here."
+                title={t('empty.noRecords')}
+                description={t('farmer.noProcurements')}
               />
             </div>
           ) : (
@@ -203,23 +205,23 @@ export const FarmerHistoryPage: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
                     <div>
-                      <span className="text-[#4B5563] block text-xs">Produce:</span>
+                      <span className="text-[#4B5563] block text-xs">{t('common.crop')}:</span>
                       <span className="font-bold text-[#1F2937]">
                         {p.actualQuantity} {p.unit} {p.cropType}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#4B5563] block text-xs">Total MSP Payout:</span>
+                      <span className="text-[#4B5563] block text-xs">{t('farmer.dbtEarnings')}:</span>
                       <span className="font-black text-[#166534] text-base">
                         ₹{p.totalPayout.toLocaleString('en-IN')}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#4B5563] block text-xs">Mandi:</span>
+                      <span className="text-[#4B5563] block text-xs">{t('common.mandi')}:</span>
                       <span className="font-semibold text-[#1F2937]">{p.centreId?.name}</span>
                     </div>
                     <div>
-                      <span className="text-[#4B5563] block text-xs">Date:</span>
+                      <span className="text-[#4B5563] block text-xs">{t('common.date')}:</span>
                       <span className="text-[#1F2937]">
                         {new Date(p.timestamp).toLocaleDateString('en-IN')}
                       </span>
@@ -234,7 +236,7 @@ export const FarmerHistoryPage: React.FC = () => {
                   className="w-full mt-2"
                   icon={<Printer size={15} />}
                 >
-                  View Official e-Receipt
+                  {t('common.printSlip')}
                 </Button>
               </div>
             ))

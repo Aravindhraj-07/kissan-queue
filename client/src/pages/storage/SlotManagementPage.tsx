@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { slotsApi, centresApi } from '../../services/api';
 import { ISlot, IProcurementCentre } from '../../types';
@@ -9,6 +10,7 @@ import { Button } from '../../components/common/Button';
 import { EmptyState } from '../../components/common/EmptyState';
 
 export const SlotManagementPage: React.FC = () => {
+  const { t } = useTranslation();
   const { centre: userCentre } = useAuth();
   const [activeCentre, setActiveCentre] = useState<IProcurementCentre | null>(userCentre);
 
@@ -99,7 +101,7 @@ export const SlotManagementPage: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <PageHeader
-        title="Slot Capacity & Schedule Setup"
+        title={t('nav.todaysSchedule')}
         description={`${activeCentre?.name ? `${activeCentre.name} • ` : ''}Configure daily time windows and regulate Mandi gate entry limits to prevent yard congestion.`}
         icon={<CalendarRange size={24} />}
         actions={
@@ -176,14 +178,14 @@ export const SlotManagementPage: React.FC = () => {
               size="sm"
               onClick={() => setIsAdding(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
               variant="primary"
               size="sm"
             >
-              Save Slot
+              {t('common.save')}
             </Button>
           </div>
         </form>

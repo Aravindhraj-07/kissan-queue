@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { farmerApi } from '../../services/api';
 import { User, CheckCircle2, Save, MapPin, Building, Sprout, Landmark } from 'lucide-react';
@@ -6,6 +7,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
 
 export const FarmerProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const { user, profile, refreshUser } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -80,7 +82,7 @@ export const FarmerProfilePage: React.FC = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Page Header */}
       <PageHeader
-        title="Farmer Profile & Bank Settings"
+        title={t('farmer.profileTitle')}
         description="Aadhaar & Bank account details for automated Direct Benefit Transfer (DBT) of Mandi MSP payouts."
         icon={<User size={24} />}
       />
@@ -96,11 +98,11 @@ export const FarmerProfilePage: React.FC = () => {
         {/* Basic Info */}
         <div className="space-y-4">
           <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#4B5563]">
-            Personal & Identification
+            {t('digitalSlip.farmerDetails')}
           </h3>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#1F2937] mb-1.5">Farmer Name</label>
+              <label className="block text-xs font-bold text-[#1F2937] mb-1.5">{t('auth.fullName')}</label>
               <input
                 type="text"
                 value={user?.name || ''}
@@ -110,7 +112,7 @@ export const FarmerProfilePage: React.FC = () => {
             </div>
             <div>
               <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
-                Kisan Registration ID
+                Kisan ID
               </label>
               <input
                 type="text"
@@ -125,11 +127,11 @@ export const FarmerProfilePage: React.FC = () => {
         {/* Location Details */}
         <div className="space-y-4 pt-5 border-t border-slate-100">
           <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#4B5563]">
-            Farm Address & Location
+            {t('auth.village')}, {t('auth.district')}, {t('auth.state')}
           </h3>
           <div className="grid sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#4B5563] mb-1">Village</label>
+              <label className="block text-xs font-semibold text-[#4B5563] mb-1">{t('auth.village')}</label>
               <input
                 type="text"
                 name="village"
@@ -140,7 +142,7 @@ export const FarmerProfilePage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#4B5563] mb-1">District</label>
+              <label className="block text-xs font-semibold text-[#4B5563] mb-1">{t('auth.district')}</label>
               <input
                 type="text"
                 name="district"
@@ -151,7 +153,7 @@ export const FarmerProfilePage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#4B5563] mb-1">State</label>
+              <label className="block text-xs font-semibold text-[#4B5563] mb-1">{t('auth.state')}</label>
               <input
                 type="text"
                 name="state"
@@ -167,12 +169,12 @@ export const FarmerProfilePage: React.FC = () => {
         {/* Bank Details */}
         <div className="space-y-4 pt-5 border-t border-slate-100">
           <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#4B5563]">
-            Aadhaar Linked Bank Account (For Automated MSP Direct Credit)
+            {t('farmer.bankAccount')} ({t('farmer.disbursed')})
           </h3>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-[#4B5563] mb-1">
-                Bank Account Number
+                {t('farmer.bankAccount')}
               </label>
               <input
                 type="text"
@@ -185,7 +187,7 @@ export const FarmerProfilePage: React.FC = () => {
             </div>
             <div>
               <label className="block text-xs font-semibold text-[#4B5563] mb-1">
-                Bank IFSC Code
+                {t('farmer.ifscCode')}
               </label>
               <input
                 type="text"
@@ -207,7 +209,7 @@ export const FarmerProfilePage: React.FC = () => {
             isLoading={isSaving}
             icon={<Save size={16} />}
           >
-            Save Profile Changes
+            {t('common.save')}
           </Button>
         </div>
       </form>

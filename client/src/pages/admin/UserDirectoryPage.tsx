@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminApi } from '../../services/api';
 import { IUser } from '../../types';
 import { Users, Search } from 'lucide-react';
@@ -9,6 +10,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { LoadingState } from '../../components/common/LoadingState';
 
 export const UserDirectoryPage: React.FC = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<IUser[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -51,7 +53,7 @@ export const UserDirectoryPage: React.FC = () => {
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <PageHeader
-        title="User & Stakeholder Directory"
+        title={t('admin.manageUsers')}
         description="Manage system permissions, account activations, and roles for Farmers, Mandi staff, and Logistics."
         icon={<Users size={24} />}
         actions={
@@ -69,11 +71,11 @@ export const UserDirectoryPage: React.FC = () => {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none bg-white cursor-pointer"
             >
-              <option value="">All Roles</option>
-              <option value="FARMER">Farmers</option>
-              <option value="STORAGE_AUTHORITY">Mandi Operators</option>
-              <option value="LOGISTICS">Logistics</option>
-              <option value="ADMIN">Administrators</option>
+              <option value="">{t('common.all')}</option>
+              <option value="FARMER">{t('roles.FARMER')}</option>
+              <option value="STORAGE_AUTHORITY">{t('roles.STORAGE_AUTHORITY')}</option>
+              <option value="LOGISTICS">{t('roles.LOGISTICS')}</option>
+              <option value="ADMIN">{t('roles.ADMIN')}</option>
             </select>
           </div>
         }
@@ -82,7 +84,7 @@ export const UserDirectoryPage: React.FC = () => {
       {/* Users Table */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
         {isLoading ? (
-          <LoadingState message="Loading stakeholder directory..." />
+          <LoadingState message={t('common.loading')} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
@@ -92,8 +94,8 @@ export const UserDirectoryPage: React.FC = () => {
                   <th className="p-4">Mobile Contact</th>
                   <th className="p-4">Email Address</th>
                   <th className="p-4">Role</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className="p-4">{t('common.status')}</th>
+                  <th className="p-4 text-right">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -101,7 +103,7 @@ export const UserDirectoryPage: React.FC = () => {
                   <tr>
                     <td colSpan={6} className="p-8">
                       <EmptyState
-                        title="No users found"
+                        title={t('empty.noUsers')}
                         description="No registered users matched your current filter criteria."
                       />
                     </td>
@@ -114,7 +116,7 @@ export const UserDirectoryPage: React.FC = () => {
                       <td className="p-4 text-[#4B5563]">{u.email || '—'}</td>
                       <td className="p-4">
                         <span className="bg-slate-100 text-[#1F2937] text-xs font-bold px-2 py-0.5 rounded uppercase border border-slate-200">
-                          {u.role.replace(/_/g, ' ')}
+                          {t(`roles.${u.role}`, { defaultValue: u.role.replace(/_/g, ' ') })}
                         </span>
                       </td>
                       <td className="p-4">

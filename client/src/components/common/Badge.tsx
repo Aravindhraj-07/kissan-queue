@@ -1,11 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   CheckCircle2,
   Clock,
   ArrowRightCircle,
   XCircle,
   Truck,
-  AlertCircle,
   CircleDot,
   LucideIcon,
 } from 'lucide-react';
@@ -17,6 +17,7 @@ interface BadgeProps {
 }
 
 export const Badge: React.FC<BadgeProps> = ({ status = '', size = 'md', className = '' }) => {
+  const { t } = useTranslation();
   const normalized = status?.toUpperCase() || 'UNKNOWN';
 
   let style = 'bg-slate-100 text-[#1F2937] border-slate-300';
@@ -91,12 +92,16 @@ export const Badge: React.FC<BadgeProps> = ({ status = '', size = 'md', classNam
     return text.replace(/_/g, ' ');
   };
 
+  const translatedLabel = t(`status.${normalized}`, {
+    defaultValue: formatText(status),
+  });
+
   return (
     <span
       className={`inline-flex items-center font-bold rounded-full border shadow-2xs transition-all duration-150 ${style} ${sizeClasses[size]} ${className}`}
     >
       <Icon size={iconSizes[size]} className="shrink-0" />
-      <span className="capitalize">{formatText(status)}</span>
+      <span>{translatedLabel}</span>
     </span>
   );
 };
