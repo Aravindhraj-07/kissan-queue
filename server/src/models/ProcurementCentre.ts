@@ -67,7 +67,6 @@ const ProcurementCentreSchema = new Schema<IProcurementCentre>(
 );
 
 ProcurementCentreSchema.index({ district: 1 });
-ProcurementCentreSchema.index({ centreCode: 1 });
 ProcurementCentreSchema.index({ 'location.lat': 1, 'location.lng': 1 });
 
 export const ProcurementCentre = mongoose.model<IProcurementCentre>(

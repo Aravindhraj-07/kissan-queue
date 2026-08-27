@@ -41,7 +41,6 @@ const FarmerProfileSchema = new Schema<IFarmerProfile>(
   { timestamps: true }
 );
 
-FarmerProfileSchema.index({ farmerId: 1 });
 FarmerProfileSchema.index({ district: 1 });
 
 export const FarmerProfile = mongoose.model<IFarmerProfile>('FarmerProfile', FarmerProfileSchema);

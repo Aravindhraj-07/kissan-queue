@@ -58,6 +58,5 @@ const ProcurementSchema = new Schema<IProcurement>(
 
 ProcurementSchema.index({ farmerId: 1 });
 ProcurementSchema.index({ centreId: 1, timestamp: -1 });
-ProcurementSchema.index({ digitalSlipNumber: 1 });
 
 export const Procurement = mongoose.model<IProcurement>('Procurement', ProcurementSchema);
