@@ -8,8 +8,8 @@ interface AuthContextType {
   centre: IProcurementCentre | null;
   token: string | null;
   isLoading: boolean;
-  login: (identifier: string, pass: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  login: (identifier: string, pass: string) => Promise<IUser | undefined>;
+  register: (data: any) => Promise<IUser | undefined>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fetchCurrentUser();
   }, []);
 
-  const login = async (identifier: string, pass: string) => {
+  const login = async (identifier: string, pass: string): Promise<IUser | undefined> => {
     setIsLoading(true);
     try {
       const res = await authApi.login(identifier, pass);
@@ -59,13 +59,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(res.data.user);
         setProfile(res.data.profile || null);
         setCentre(res.data.centre || null);
+        return res.data.user;
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const register = async (data: any) => {
+  const register = async (data: any): Promise<IUser | undefined> => {
     setIsLoading(true);
     try {
       const res = await authApi.register(data);
@@ -74,6 +75,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setToken(res.data.token);
         setUser(res.data.user);
         setProfile(res.data.profile || null);
+        return res.data.user;
       }
     } finally {
       setIsLoading(false);

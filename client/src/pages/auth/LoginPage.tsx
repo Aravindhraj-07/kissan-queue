@@ -24,8 +24,19 @@ export const LoginPage: React.FC = () => {
 
     setError('');
     try {
-      await login(identifier, password);
-      navigate('/');
+      const loggedInUser = await login(identifier, password);
+      const role = loggedInUser?.role;
+      if (role === 'FARMER') {
+        navigate('/farmer', { replace: true });
+      } else if (role === 'STORAGE_AUTHORITY') {
+        navigate('/storage', { replace: true });
+      } else if (role === 'LOGISTICS') {
+        navigate('/logistics', { replace: true });
+      } else if (role === 'ADMIN') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/farmer', { replace: true });
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     }
