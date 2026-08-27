@@ -5,6 +5,7 @@ import { connectDB } from './config/db.js';
 import { ENV } from './config/env.js';
 import { initSocketIO } from './sockets/socketManager.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { ensureDefaultAccounts } from './services/seedService.js';
 
 // Route imports
 import authRoutes from './routes/authRoutes.js';
@@ -64,6 +65,7 @@ app.use(errorHandler);
 // Start server
 const startServer = async () => {
   await connectDB();
+  await ensureDefaultAccounts();
 
   httpServer.listen(ENV.PORT, () => {
     console.log(`=======================================================`);

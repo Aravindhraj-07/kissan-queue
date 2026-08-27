@@ -53,7 +53,7 @@ export const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-[#1F2937] mb-1.5">
+              <label htmlFor="identifier" className="block text-xs font-bold text-[#1F2937] mb-1.5">
                 Registered Mobile Number / Official Email
               </label>
               <div className="relative">
@@ -61,10 +61,13 @@ export const LoginPage: React.FC = () => {
                   <Phone size={16} />
                 </div>
                 <input
+                  id="identifier"
+                  name="identifier"
                   type="text"
+                  autoComplete="username"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="e.g. 9876500001 or farmer@procurex.gov.in"
+                  placeholder="Enter registered mobile or email"
                   className="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
                   required
                 />
@@ -72,16 +75,19 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#1F2937] mb-1.5">Password</label>
+              <label htmlFor="password" className="block text-xs font-bold text-[#1F2937] mb-1.5">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#4B5563]">
                   <Lock size={16} />
                 </div>
                 <input
+                  id="password"
+                  name="password"
                   type="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-xs sm:text-sm text-[#1F2937] focus:ring-2 focus:ring-[#15803D] focus:outline-none"
                   required
                 />

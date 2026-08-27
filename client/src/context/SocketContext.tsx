@@ -25,8 +25,13 @@ export const SocketProvider: React.FC<{ children: ReactNode; userId?: string }> 
   const [latestLogisticsTask, setLatestLogisticsTask] = useState<ITransportTask | null>(null);
 
   useEffect(() => {
-    // Connect to server (proxied in Vite or localhost:5000)
-    const newSocket = io(window.location.origin, {
+    // Connect to server (VITE_API_URL for deployed link or origin for local proxy)
+    const defaultDeployedBackend = 'https://kissan-queue.onrender.com';
+    const socketOrigin =
+      import.meta.env.VITE_API_URL?.replace(/\/$/, '') ||
+      (import.meta.env.PROD ? defaultDeployedBackend : window.location.origin);
+
+    const newSocket = io(socketOrigin, {
       transports: ['websocket', 'polling'],
     });
 

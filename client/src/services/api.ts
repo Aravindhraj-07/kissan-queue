@@ -10,8 +10,12 @@ import {
   ILiveQueueSummary,
 } from '../types';
 
+const defaultDeployedBackend = 'https://kissan-queue.onrender.com';
+const backendUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? defaultDeployedBackend : '');
+const apiBase = backendUrl ? `${backendUrl.replace(/\/$/, '')}/api` : '/api';
+
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: apiBase,
   headers: {
     'Content-Type': 'application/json',
   },
